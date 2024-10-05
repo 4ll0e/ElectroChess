@@ -1,0 +1,109 @@
+<div id="logged-as">
+  Logged in as
+  <b>{{ socketService.player.name }}</b>
+</div>
+<div class="overlay text-center" *ngIf="gameService.winner !== -1">
+  <h1 class="text-white">{{ gameService.winner === gameService.player.id ? 'You won the game!' : 'You lost the game :(' }}</h1>
+  <button class="btn btn-outline-info" (click)="endGame()">Back to the players list</button>
+</div>
+<div id="game-wrapper" class="mx-auto">
+  <!-- Left side menu -->
+  <div class="side-menu">
+    <!-- Currently playing -->
+    <div class="card mb-1">
+      <div class="card-header">
+        <h5 class="card-title mt-2">
+          <i class="fas fa-gamepad"></i>
+          Currently playing
+        </h5>
+      </div>
+      <div class="card-body">
+        <span>
+          <i [ngClass]="gameService.player.side === 1 ? 'far' : 'fas'" class="fa-circle"></i>
+          {{ gameService.player.name }}
+        </span>
+        <br>
+        <span>
+          <i [ngClass]="gameService.opponent.side === 1 ? 'far' : 'fas'" class="fa-circle"></i>
+          {{ gameService.opponent.name }}
+        </span>
+      </div>
+    </div>
+    <!-- Chat -->
+    <div class="card" style="height: 349px;">
+      <div class="card-header">
+        <h5 class="card-title mt-2">
+          <i class="fas fa-comments"></i>
+          Chat
+        </h5>
+      </div>
+      <div class="card-body">
+      </div>
+    </div>
+  </div>
+  <!-- Board -->
+  <div id="board" (click)="onBoardClick($event)">
+    <!-- Pawn promotion -->
+    <div class="promotion-popup" *ngIf="pawnToPromote" [ngStyle]="getPromotionPopupPosition()">
+      <div class="triangle-up" *ngIf="pawnToPromote && pawnToPromote.side === 1"></div>
+      <div [style.background-color]="'#8db9e2'">
+        <!-- Promote to knight -->
+        <a class="promotion-possibility" [ngClass]="getPromotionPossiblityClass(0)" (click)="promoteTo(0)"></a>
+        <!-- Promote to Bishop -->
+        <a class="promotion-possibility" [ngClass]="getPromotionPossiblityClass(1)" (click)="promoteTo(1)"></a>
+        <!-- Promote to Rook -->
+        <a class="promotion-possibility" [ngClass]="getPromotionPossiblityClass(2)" (click)="promoteTo(2)"></a>
+        <!-- Promote to Queen -->
+        <a class="promotion-possibility" [ngClass]="getPromotionPossiblityClass(3)" (click)="promoteTo(3)"></a>
+      </div>
+      <div class="triangle-down" *ngIf="pawnToPromote && pawnToPromote.side === 0"></div>
+    </div>
+    <div *ngFor="let possibleDestination of possibleDestinations" class="possible-destination" [style.left.px]="possibleDestination.col * 64"
+      [style.top.px]="possibleDestination.row * 64"></div>
+    <div *ngFor="let piece of gameService.board.pieces" class="piece" [ngClass]="getPieceClass(piece)" [style.left.px]="piece.col * 64"
+      [style.top.px]="piece.row * 64"></div>
+  </div>
+  <!-- Right side menu -->
+  <div class="side-menu">
+    <!-- Moves -->
+    <div class="card mb-1" style="height: 329px;">
+      <div class="card-header">
+        <h5 class="card-title mt-2">
+          <i class="fas fa-expand-arrows-alt"></i>
+          Moves
+        </h5>
+      </div>
+      <div id="moves" class="card-body">
+        <table class="text-center" style="width: 193px;">
+          <tr>
+            <td>
+              <i class="fas fa-circle"></i>
+            </td>
+            <td>
+              <i class="far fa-circle"></i>
+            </td>
+          </tr>
+          <tr *ngFor="let move of gameService.moves">
+            <td>{{ move.getBlackStr() }}</td>
+            <td>{{ move.getWhiteStr() }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <!-- Actions -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mt-2">
+          <i class="fas fa-star"></i>
+          Actions
+        </h5>
+      </div>
+      <div class="card-body">
+        <p class="text-center font-weight-bold mb-2">{{ gameService.myTurn ? 'Your turn' : 'Waiting for opponent' }}</p>
+        <button class="btn btn-outline-info" data-toggle="tooltip" title="Abandon">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
